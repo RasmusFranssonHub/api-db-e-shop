@@ -1,3 +1,27 @@
+# E-Shop API & Frontend
+
+> 🚧 **Pågående projekt** — Backend är färdigställd och frontend är under aktiv utveckling.
+
+Det här är ett pågående fullstack-projekt där jag bygger en komplett e-shop med **Node.js, Express, MySQL och React**.
+
+Projektet började med att utveckla ett REST API och en relationsdatabas för hantering av produkter och kategorier. **Backend-delen är nu färdig** och innehåller bland annat CRUD-funktionalitet, relationshantering mellan produkter och kategorier samt en strukturerad databaslösning.
+
+Nästa fas är att koppla ihop backend med frontend. Jag har tagit fram en egen **UI/UX-lösning i Figma** och arbetar nu med att omsätta designen till ett fungerande och responsivt React-gränssnitt.
+
+Frontend utvecklas som ett **back-office-system för en e-shop**, där målet är att använda API:et för att hantera och presentera produkt- och kategoridata genom ett tydligt användargränssnitt.
+
+## Projektets status
+
+- ✅ REST API
+- ✅ Node.js & Express backend
+- ✅ MySQL-databas
+- ✅ CRUD för produkter och kategorier
+- ✅ Relation mellan produkter och kategorier
+- ✅ API-testning med Insomnia
+- ✅ UI/UX-design i Figma
+- 🚧 React-frontend under utveckling
+- 🚧 Koppling mellan frontend och backend
+- 🚧 Responsiv implementation
 
 # E-Shop API
 
