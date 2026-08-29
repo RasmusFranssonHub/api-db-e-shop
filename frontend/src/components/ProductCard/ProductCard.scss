@@ -1,0 +1,37 @@
+// =================
+// ProductCard Styles
+
+.product-card {
+    border-radius: 10px;
+    background-color: #fff;
+}
+
+.product-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.product-title-container {
+    padding: 10px;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    margin: 0 0 5px 0;
+}
+
+.product-details {
+    display: flex;
+    justify-content: space-between;
+}
+
+.product-price {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.product-stock {
+    color: var(--text-secondary);
+    margin: 0;
+}

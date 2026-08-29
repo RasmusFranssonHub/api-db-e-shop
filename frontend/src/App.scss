@@ -1,0 +1,15 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  align-items: flex-start;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  margin-left: var(--sidebar-width);
+}
