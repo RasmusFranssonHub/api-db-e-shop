@@ -1,0 +1,56 @@
+//===============================
+//Categories page styles
+//===============================
+
+.categories {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 20px;
+    min-height: 100vh;
+}
+
+.categories-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+//===============================
+//Add product button style
+
+
+
+.add-category-button {
+  display: flex;
+  gap: 14px;
+}
+
+.add-category-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 1.8px solid var(--color-text);
+  border-radius: 10px;
+  background-color: var(--background);
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-category-button img {
+  width: 25px;
+  height: 25px;
+}
+
+.add-category-button:hover {
+  background-color: var(--color-primary-hover-btn);
+  color: var(--color-bg);
+  border: 1.8px solid var(--color-primary-hover-btn);
+    img {
+      filter: brightness(0) invert(1);
+    }
+}

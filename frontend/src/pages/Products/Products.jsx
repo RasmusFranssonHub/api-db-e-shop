@@ -76,21 +76,6 @@ function Products() {
       </div>
       {showForm && <ProductsForm onClose={() => setShowForm(false)} />}
 
-
-        {/* product pages */}
-
-        <div className="product-pages">
-          <div className="pagination-view">
-            <p>Page 1 of 2</p>
-          </div>
-          
-          <nav className="pagination">
-            <button>Previous</button>
-            <button>1</button>
-            <button>2</button>
-            <button>Next</button>
-          </nav>
-        </div>
     </section>
   );
 }

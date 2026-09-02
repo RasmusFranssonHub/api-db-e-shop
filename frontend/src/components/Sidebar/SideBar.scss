@@ -20,7 +20,7 @@
 .sidebar-header {
   padding: 25px;
   padding-bottom: 80px;
-  border-bottom: 0.8px solid var(--color-border);
+  border-bottom: 0.8px solid var(--text-secondary);
 }
 
 .sidebar h2 {
@@ -74,7 +74,7 @@
 
 .sidebar-user {
   margin-top: auto;
-  //border: 1px solid var(--color-border);
+  border: 0.7px solid var(--text-secondary);
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@
 }
 
 .user-name {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
 }
 .user-role {
