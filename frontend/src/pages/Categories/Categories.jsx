@@ -20,6 +20,15 @@ export default function Categories() {
         <h2>Alla kategorier</h2>
       </section>
 
+      {/* Lista över alla kategorier */}
+      <div className="categories-list">
+        {/* Här kan du rendera varje kategori som en lista eller kort */}
+        <ul>
+          <li>Kategori 1</li>
+          <li>Kategori 2</li>
+          <li>Kategori 3</li>
+        </ul>
+      </div>
     </div>
   );
 }
