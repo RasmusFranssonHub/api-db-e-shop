@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Products from "./pages/Products/Products";
 import Categories from "./pages/Categories/Categories";
 import Preview from "./pages/Preview/Preview";
-import Login from "./pages/Login/Login";
+import Login from "./pages/login/Login";
 
 function App() {
   return (

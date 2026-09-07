@@ -1,0 +1,84 @@
+.login {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+}
+
+.login-container form {
+    width: 100%;
+}
+
+
+.login-container {
+  background-color: #ffffff;
+  padding: 2rem 4rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  width: 600px;
+}
+
+.login-container h1 {
+  font-size: 2.5rem;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.login-container p {
+  margin-bottom: 1rem;
+  color: #888585;
+  font-weight: 600;
+}
+
+// Input wrapper and icon styles
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.input-icon {
+  position: absolute;
+  left: 10px;
+  top: 40%;
+  transform: translateY(-50%);
+
+  width: 20px;
+  height: 20px;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding-left: 40px;
+  padding: 0.5rem 0.5rem 0.5rem 40px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background-color: #080808;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #4e4e4e;
+}
+
+

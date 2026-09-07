@@ -19,6 +19,7 @@ import { useState } from 'react';
 
 function Dashboard() {
   const [showForm, setShowForm] = useState(false);
+  const username = localStorage.getItem("username");
   return (
     <div className="dashboard">
 
@@ -32,7 +33,7 @@ function Dashboard() {
 
         <div className="hero-content">
           <div className="hero-text">
-            <h1>God morgon, Rasmus!</h1>
+            <h1>God morgon, {username}!</h1>
             <p>Redo att annonsera mera?</p>
           </div>
 

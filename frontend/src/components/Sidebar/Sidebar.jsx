@@ -6,6 +6,7 @@ import tagIcon from "../../assets/icons/noun-tag.svg";
 import { Link } from 'react-router-dom';
 
 function Sidebar() {
+  const username = localStorage.getItem("username");
   return (
     <aside className="sidebar">
       <div className="sidebar-header">
@@ -38,11 +39,11 @@ function Sidebar() {
       <div className="sidebar-user">
 
         <div className="user-avatar">
-          R
+          {username?.charAt(0).toUpperCase() || "R"}
         </div>
 
         <div className="user-info">
-          <p className="user-name">Rasmus</p>
+          <p className="user-name">{username?.charAt(0).toUpperCase() + username?.slice(1)}</p>
           <p className="user-role">Administratör</p>
         </div>
       </div>
