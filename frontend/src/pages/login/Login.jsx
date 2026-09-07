@@ -45,8 +45,8 @@ function Login() {
                         onChange={(e) => setUsername(e.target.value)}
                     />
                     </div>
-                    
-                    <button type="submit">
+
+                    <button type="submit" className="login-button">
                     Logga in
                     </button>
                 </form>
