@@ -16,23 +16,25 @@ router.get('/', async (req, res) => {
   try {
     const { search, sort } = req.query;
 
-    let sql = 'SELECT * FROM products';
+    let sql = 'SELECT products.*, GROUP_CONCAT(product_categories.category_id) AS category_ids FROM products LEFT JOIN product_categories ON products.id = product_categories.product_id';
     const values = [];
 
     // Search by product title
     if (search) {
-      sql += ' WHERE title LIKE ?';
+      sql += ' WHERE products.title LIKE ?';
       values.push(`%${search}%`);
     }
 
     // Sort by price
     if (sort === 'price_asc') {
-      sql += ' ORDER BY price ASC';
+      sql += ' GROUP BY products.id ORDER BY price ASC';
     }
 
     if (sort === 'price_desc') {
-      sql += ' ORDER BY price DESC';
+      sql += ' GROUP BY products.id ORDER BY price DESC';
     }
+
+    if (!sort) sql += ' GROUP BY products.id';
 
     const [rows] = await db.query(sql, values);
 

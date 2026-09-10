@@ -95,6 +95,10 @@ router.post('/', async (req, res) => {
   } catch (error) {
     console.error(error);
 
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(409).json({ error: 'En kategori med det namnet finns redan.' });
+    }
+
     res.status(500).json({
       error: 'Could not add category'
     });

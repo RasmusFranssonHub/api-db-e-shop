@@ -21,15 +21,16 @@ import { useNavigate } from 'react-router-dom';
 function Dashboard() {
   const [showForm, setShowForm] = useState(false);
   const [recentProducts, setRecentProducts] = useState([]);
+  const [stats, setStats] = useState({ products: 0, categories: 0, lowStock: 0 });
   const navigate = useNavigate();
   const username = localStorage.getItem("username");
   useEffect(() => {
-    fetch('http://localhost:3000/products')
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error('Kunde inte hämta produkter')))
-      .then((rows) => setRecentProducts(rows
-        .sort((first, second) => new Date(second.created_date) - new Date(first.created_date))
-        .slice(0, 5)
-        .map((row) => ({ ...row, image: row.image ? `http://localhost:3000${row.image}` : fallbackProductImage }))))
+    Promise.all([fetch('http://localhost:3000/products'), fetch('http://localhost:3000/categories')])
+      .then(async ([productsResponse, categoriesResponse]) => [await productsResponse.json(), await categoriesResponse.json()])
+      .then(([rows, categories]) => {
+        setStats({ products: rows.length, categories: categories.length, lowStock: rows.filter((product) => Number(product.stock) <= 10).length });
+        setRecentProducts(rows.sort((first, second) => new Date(second.created_date) - new Date(first.created_date)).slice(0, 5).map((row) => ({ ...row, image: row.image ? `http://localhost:3000${row.image}` : fallbackProductImage })));
+      })
       .catch((error) => console.error(error));
   }, []);
   return (
@@ -68,21 +69,21 @@ function Dashboard() {
 
       <section className="stats">
         <StatCard
-          number={45}
+          number={stats.products}
           label="Produkter totalt"
           icon={statProductIcon}
           onClick={() => navigate('/products?filter=all')}
         />
 
         <StatCard
-          number={14}
+          number={stats.categories}
           label="Kategorier"
           icon={statCategoryIcon}
           onClick={() => navigate('/categories')}
         />
 
         <StatCard
-          number={9}
+          number={stats.lowStock}
           label="Produkter med lågt saldo"
           icon={statLowStockIcon}
           onClick={() => navigate('/products?sort=stock_asc')}

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./ProductsForm.scss";
 
-function ProductsForm({ onClose, onCreated }) {
+function ProductsForm({ onClose, onCreated, categories }) {
   const [errors, setErrors] = useState({});
   const preventInvalidNumber = (event) => {
     if (event.key === "-" || event.key === "e") event.preventDefault();
@@ -61,12 +61,7 @@ function ProductsForm({ onClose, onCreated }) {
           <fieldset className={`category-checkboxes ${errors.categories ? "has-error" : ""}`}>
             <legend>Kategorier</legend>
             <div className="category-options">
-              <label><input name="categories" type="checkbox" value="1" /> För honom</label>
-              <label><input name="categories" type="checkbox" value="2" /> För henne</label>
-              <label><input name="categories" type="checkbox" value="4" /> T-shirts</label>
-              <label><input name="categories" type="checkbox" value="5" /> Hoodies</label>
-              <label><input name="categories" type="checkbox" value="6" /> Strumpor</label>
-              <label><input name="categories" type="checkbox" value="7" /> Kepsar &amp; Mössor</label>
+              {categories.map((category) => <label key={category.id}><input name="categories" type="checkbox" value={category.id} /> {category.name}</label>)}
             </div>
             {errors.categories && <span className="field-error">{errors.categories}</span>}
           </fieldset>

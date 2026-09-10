@@ -14,13 +14,16 @@ function Products() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState(searchParams.get("sort") ?? "");
+  const [categoryId, setCategoryId] = useState("all");
+  const [categories, setCategories] = useState([]);
   useEffect(() => {
     fetch("http://localhost:3000/products")
       .then((response) => response.ok ? response.json() : Promise.reject(new Error("Kunde inte hämta produkter")))
-      .then((rows) => setProductItems(rows.map((row) => ({ ...row, name: row.title, price: Number(row.price), image: row.image ? `http://localhost:3000${row.image}` : products[0].image }))))
+      .then((rows) => setProductItems(rows.map((row) => ({ ...row, categoryIds: row.category_ids ? row.category_ids.split(',').map(Number) : [], name: row.title, price: Number(row.price), image: row.image ? `http://localhost:3000${row.image}` : products[0].image }))))
       .catch((error) => console.error(error));
   }, []);
-  const visibleProducts = [...productItems].filter((product) => product.name.toLowerCase().includes(search.toLowerCase())).sort((a, b) => sort === "stock_asc" ? a.stock - b.stock : 0);
+  useEffect(() => { fetch('http://localhost:3000/categories').then((response) => response.json()).then(setCategories); }, []);
+  const visibleProducts = [...productItems].filter((product) => product.name.toLowerCase().includes(search.toLowerCase()) && (categoryId === 'all' || product.categoryIds?.includes(Number(categoryId)))).sort((a, b) => sort === "stock_asc" ? a.stock - b.stock : sort === 'price_asc' ? a.price - b.price : sort === 'price_desc' ? b.price - a.price : 0);
   return (
 
 
@@ -58,14 +61,9 @@ function Products() {
         />
 
         <label htmlFor="category">Kategori:</label>
-        <select id="category">
+        <select id="category" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
           <option value="all">Alla</option>
-          <option value="his">För honom</option>
-          <option value="hers">För henne</option>
-          <option value="t-shirt">T-shirts</option>
-          <option value="hoodies">Hoodies</option>
-          <option value="socks">Strumpor</option>
-          <option value="caps-&-beanies">Kepsar & Mössor</option>
+          {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
         </select>
 
         <label htmlFor="sort">Sortera:</label>
@@ -92,8 +90,8 @@ function Products() {
           />
         ))}
       </div>
-      {showForm && <ProductsForm onClose={() => setShowForm(false)} onCreated={async (body) => { const response = await fetch('http://localhost:3000/products', { method: 'POST', body }); const created = await response.json(); if (!response.ok) throw new Error(created.error); setProductItems((items) => [{ ...created, name: created.title, price: Number(created.price), image: `http://localhost:3000${created.image}` }, ...items]); setShowForm(false); }} />}
-      {editingProduct && <ProductEditForm product={editingProduct} onClose={() => setEditingProduct(null)} onSave={async (updatedProduct) => { const body = new FormData(); body.append('title', updatedProduct.name); body.append('price', updatedProduct.price); body.append('stock', updatedProduct.stock); if (updatedProduct.imageFile) body.append('image', updatedProduct.imageFile); const response = await fetch(`http://localhost:3000/products/${updatedProduct.id}`, { method: 'PATCH', body }); const saved = await response.json(); if (!response.ok) throw new Error(saved.error); setProductItems((items) => items.map((item) => item.id === saved.id ? { ...item, name: saved.title, price: Number(saved.price), stock: saved.stock, image: `http://localhost:3000${saved.image}` } : item)); }} onDelete={async (id) => { const response = await fetch(`http://localhost:3000/products/${id}`, { method: 'DELETE' }); if (response.ok) setProductItems((items) => items.filter((item) => item.id !== id)); }} />}
+      {showForm && <ProductsForm categories={categories} onClose={() => setShowForm(false)} onCreated={async (body) => { const response = await fetch('http://localhost:3000/products', { method: 'POST', body }); const created = await response.json(); if (!response.ok) throw new Error(created.error); setProductItems((items) => [{ ...created, categoryIds: JSON.parse(body.get('category_ids')), name: created.title, price: Number(created.price), image: `http://localhost:3000${created.image}` }, ...items]); setShowForm(false); }} />}
+      {editingProduct && <ProductEditForm categories={categories} product={editingProduct} onClose={() => setEditingProduct(null)} onSave={async (updatedProduct) => { const body = new FormData(); body.append('title', updatedProduct.name); body.append('price', updatedProduct.price); body.append('stock', updatedProduct.stock); body.append('category_ids', JSON.stringify(updatedProduct.categoryIds)); if (updatedProduct.imageFile) body.append('image', updatedProduct.imageFile); const response = await fetch(`http://localhost:3000/products/${updatedProduct.id}`, { method: 'PATCH', body }); const saved = await response.json(); if (!response.ok) throw new Error(saved.error); setProductItems((items) => items.map((item) => item.id === saved.id ? { ...item, name: saved.title, price: Number(saved.price), stock: saved.stock, categoryIds: updatedProduct.categoryIds, image: `http://localhost:3000${saved.image}` } : item)); }} onDelete={async (id) => { const response = await fetch(`http://localhost:3000/products/${id}`, { method: 'DELETE' }); if (response.ok) setProductItems((items) => items.filter((item) => item.id !== id)); }} />}
 
     </section>
   );
