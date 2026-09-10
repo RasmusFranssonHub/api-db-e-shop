@@ -2,11 +2,25 @@ import "./Products.scss";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import products from "../../data/products";
 import plusIcon from "../../assets/icons/noun-plus.svg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProductsForm from "../../components/ProductsForm/ProductsForm";
+import ProductEditForm from "../../components/ProductEditForm/ProductEditForm";
+import { useSearchParams } from "react-router-dom";
 
 function Products() {
   const [showForm, setShowForm] = useState(false);
+  const [productItems, setProductItems] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [searchParams] = useSearchParams();
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState(searchParams.get("sort") ?? "");
+  useEffect(() => {
+    fetch("http://localhost:3000/products")
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error("Kunde inte hämta produkter")))
+      .then((rows) => setProductItems(rows.map((row) => ({ ...row, name: row.title, price: Number(row.price), image: row.image ? `http://localhost:3000${row.image}` : products[0].image }))))
+      .catch((error) => console.error(error));
+  }, []);
+  const visibleProducts = [...productItems].filter((product) => product.name.toLowerCase().includes(search.toLowerCase())).sort((a, b) => sort === "stock_asc" ? a.stock - b.stock : 0);
   return (
 
 
@@ -38,6 +52,8 @@ function Products() {
         <input
           id="search"
           type="text"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
           placeholder="Sök produkt..."
         />
 
@@ -53,10 +69,11 @@ function Products() {
         </select>
 
         <label htmlFor="sort">Sortera:</label>
-        <select id="sort">
+        <select id="sort" value={sort} onChange={(event) => setSort(event.target.value)}>
           <option value="">Standard</option>
           <option value="price_asc">Pris: lägst först</option>
           <option value="price_desc">Pris: högst först</option>
+          <option value="stock_asc">Lager: lägst först</option>
         </select>
         </div>
       </section>
@@ -64,17 +81,19 @@ function Products() {
     {/* PRODUCT LIST*/}
 
       <div className="product-list">
-        {products.map((product) => (
+        {visibleProducts.map((product) => (
           <ProductCard
             key={product.id}
             image={product.image}
             title={product.name}
             price={`${product.price} SEK`}
             stock={`${product.stock}st i lager`}
+            onEdit={() => setEditingProduct(product)}
           />
         ))}
       </div>
-      {showForm && <ProductsForm onClose={() => setShowForm(false)} />}
+      {showForm && <ProductsForm onClose={() => setShowForm(false)} onCreated={async (body) => { const response = await fetch('http://localhost:3000/products', { method: 'POST', body }); const created = await response.json(); if (!response.ok) throw new Error(created.error); setProductItems((items) => [{ ...created, name: created.title, price: Number(created.price), image: `http://localhost:3000${created.image}` }, ...items]); setShowForm(false); }} />}
+      {editingProduct && <ProductEditForm product={editingProduct} onClose={() => setEditingProduct(null)} onSave={async (updatedProduct) => { const body = new FormData(); body.append('title', updatedProduct.name); body.append('price', updatedProduct.price); body.append('stock', updatedProduct.stock); if (updatedProduct.imageFile) body.append('image', updatedProduct.imageFile); const response = await fetch(`http://localhost:3000/products/${updatedProduct.id}`, { method: 'PATCH', body }); const saved = await response.json(); if (!response.ok) throw new Error(saved.error); setProductItems((items) => items.map((item) => item.id === saved.id ? { ...item, name: saved.title, price: Number(saved.price), stock: saved.stock, image: `http://localhost:3000${saved.image}` } : item)); }} onDelete={async (id) => { const response = await fetch(`http://localhost:3000/products/${id}`, { method: 'DELETE' }); if (response.ok) setProductItems((items) => items.filter((item) => item.id !== id)); }} />}
 
     </section>
   );

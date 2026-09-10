@@ -74,7 +74,7 @@ router.get('/:id/products', async (req, res) => {
 // POST - create category
 router.post('/', async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, icon = null } = req.body;
 
     if (!name) {
       return res.status(400).json({
@@ -83,13 +83,13 @@ router.post('/', async (req, res) => {
     }
 
     const [result] = await db.query(
-      'INSERT INTO categories (name) VALUES (?)',
-      [name]
+      'INSERT INTO categories (name, icon) VALUES (?, ?)',
+      [name, icon]
     );
 
     res.status(201).json({
       id: result.insertId,
-      name
+      name, icon
     });
 
   } catch (error) {
@@ -105,7 +105,7 @@ router.post('/', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name, icon = null } = req.body;
 
     if (!name) {
       return res.status(400).json({
@@ -114,8 +114,8 @@ router.patch('/:id', async (req, res) => {
     }
 
     const [result] = await db.query(
-      'UPDATE categories SET name = ? WHERE id = ?',
-      [name, id]
+      'UPDATE categories SET name = ?, icon = ? WHERE id = ?',
+      [name, icon, id]
     );
 
     if (result.affectedRows === 0) {
@@ -126,7 +126,7 @@ router.patch('/:id', async (req, res) => {
 
     res.json({
       id: Number(id),
-      name
+      name, icon
     });
 
   } catch (error) {

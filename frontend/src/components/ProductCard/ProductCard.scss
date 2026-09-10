@@ -35,3 +35,6 @@
     color: var(--text-secondary);
     margin: 0;
 }
+.product-card-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+.edit-product-button { width:28px; height:28px; border:1px solid #ddd4cf; border-radius:7px; background:#fff; color:var(--color-text); font-size:18px; line-height:1; cursor:pointer; }
+.edit-product-button:hover { border-color:var(--color-primary-btn); color:var(--color-primary-btn); }

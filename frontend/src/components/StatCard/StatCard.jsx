@@ -1,8 +1,8 @@
 import "./StatCard.scss";
 
-export default function StatCard({ number, label, icon }) {
+export default function StatCard({ number, label, icon, onClick }) {
   return (
-    <div className="stat-card">
+    <button className="stat-card" type="button" onClick={onClick}>
       <div className="card-icon-container">
         <img src={icon} alt="" className="card-icon" />
       </div>
@@ -11,6 +11,6 @@ export default function StatCard({ number, label, icon }) {
         <span className="card-number">{number}</span>
         <span className="card-label">{label}</span>
       </div>
-    </div>
+    </button>
   );
 }

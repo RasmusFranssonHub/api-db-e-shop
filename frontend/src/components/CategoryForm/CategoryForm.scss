@@ -1,0 +1,138 @@
+.category-form-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 16, 14, 0.52);
+  backdrop-filter: blur(3px);
+}
+
+.category-form {
+  width: min(100%, 560px);
+  max-height: calc(100vh - 48px);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 16px;
+  background: var(--color-card-bg);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+}
+
+.category-form-header,
+.category-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+}
+
+.category-form-header { border-bottom: 1px solid #ece7e3; }
+.category-form-header h2 { margin: 0; font-size: 22px; }
+
+.category-close-button {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-text);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.category-close-button:hover { background: #f1ece8; }
+
+.category-form-body {
+  max-height: calc(100vh - 205px);
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.category-name-field { display: flex; flex-direction: column; gap: 7px; }
+.category-name-field label, .icon-picker legend { font-size: 14px; font-weight: 700; }
+
+.category-name-field input {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #d8d1cc;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.category-name-field input:focus { outline: 3px solid rgba(205, 121, 121, 0.2); border-color: var(--color-primary-btn); }
+.category-name-field input[aria-invalid="true"], .icon-picker.has-error { border-color: #c84141; }
+
+.icon-picker {
+  margin: 24px 0 0;
+  padding: 16px;
+  border: 1px solid #d8d1cc;
+  border-radius: 10px;
+}
+
+.icon-picker legend { padding: 0 6px; }
+
+.icon-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(48px, 1fr));
+  gap: 10px;
+}
+
+.icon-option {
+  display: grid;
+  aspect-ratio: 1;
+  place-items: center;
+  border: 1px solid #e0d8d3;
+  border-radius: 8px;
+  background: #fdfaf8;
+  cursor: pointer;
+}
+
+.icon-option img { width: 25px; height: 25px; }
+.icon-option:hover { border-color: var(--color-primary-btn); background: #fff5f5; }
+.icon-option.is-selected { border: 2px solid var(--color-primary-btn); background: #fceaea; }
+
+.category-error-summary {
+  margin: 0 0 20px;
+  padding: 11px 12px;
+  border-radius: 8px;
+  background: #fff0f0;
+  color: #a22929;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.category-field-error { color: #b23131; font-size: 12px; font-weight: 600; }
+
+.category-form-actions {
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #ece7e3;
+  background: #fdfaf8;
+}
+
+.category-form-actions button {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.category-cancel-button { border: 1px solid #d8d1cc; background: #fff; color: var(--color-text); }
+.category-submit-button { border: 1px solid var(--color-primary-btn); background: var(--color-primary-btn); color: #fff; }
+.category-delete-button { margin-right:auto; border:1px solid #d88; background:#fff; color:#a22929; }
+.category-delete-confirm { margin:0 24px 18px; padding:14px; display:flex; flex-direction:column; gap:8px; border:1px solid #e6a3a3; border-radius:9px; background:#fff4f4; color:#8d2525; }
+.category-delete-confirm div { display:flex; gap:8px; }.category-delete-confirm button { padding:8px 12px; border:1px solid #d8d1cc; border-radius:7px; background:#fff; cursor:pointer; }.category-delete-confirm button:last-child { border-color:#b23131; background:#b23131; color:#fff; }
+.category-cancel-button:hover { background: #f1ece8; }
+.category-submit-button:hover { filter: brightness(0.92); }
+
+@media (max-width: 520px) {
+  .category-form-overlay { padding: 12px; }
+  .category-form-header, .category-form-body, .category-form-actions { padding-left: 18px; padding-right: 18px; }
+  .category-form-actions button { flex: 1; }
+}

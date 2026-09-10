@@ -69,6 +69,13 @@
   }
 }
 
+.nav-item.active {
+  background: var(--color-primary-hover-btn);
+  color: var(--color-bg);
+}
+
+.nav-item.active img { filter: brightness(0) invert(1); }
+
 //==============================
 //SIDEBAR USER
 

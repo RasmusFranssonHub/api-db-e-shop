@@ -1,98 +1,87 @@
+import { useState } from "react";
 import "./ProductsForm.scss";
 
-function ProductsForm({ onClose }) {
+function ProductsForm({ onClose, onCreated }) {
+  const [errors, setErrors] = useState({});
+  const preventInvalidNumber = (event) => {
+    if (event.key === "-" || event.key === "e") event.preventDefault();
+  };
+
+  const validateForm = (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const nextErrors = {};
+
+    if (!formData.get("name")?.trim()) nextErrors.name = "Ange ett produktnamn.";
+    if (!formData.get("price")) nextErrors.price = "Ange ett pris.";
+    if (!formData.get("stock")) nextErrors.stock = "Ange lagersaldo.";
+    if (formData.getAll("categories").length === 0) nextErrors.categories = "Välj minst en kategori.";
+    if (!formData.get("image")?.name) nextErrors.image = "Välj en produktbild.";
+
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length === 0) {
+      formData.set("title", formData.get("name"));
+      formData.set("description", "Skapad via Shop Portal");
+      formData.set("category_ids", JSON.stringify(formData.getAll("categories").map(Number)));
+      onCreated(formData);
+    }
+  };
+
   return (
-    <div className="product-form-overlay">
-      <form className="product-form">
+    <div className="product-form-overlay" role="presentation">
+      <form className="product-form" onSubmit={validateForm} noValidate>
+        <header className="product-form-header">
+          <h2>Lägg till produkt</h2>
+          <button type="button" className="close-button" onClick={onClose} aria-label="Stäng formuläret">×</button>
+        </header>
 
-        <button
-          type="button"
-          className="close-button"
-          onClick={onClose}
-        >
-          ×
-        </button>
+        <div className="product-form-body">
+          {Object.keys(errors).length > 0 && <p className="form-error-summary" role="alert">Fyll i alla obligatoriska fält innan du lägger till produkten.</p>}
 
-        <h2>Lägg till produkt</h2>
+          <div className="product-form-fields">
+            <div className="form-field form-field-wide">
+              <label htmlFor="name">Produktnamn</label>
+              <input id="name" name="name" type="text" placeholder="Ange produktnamn" aria-invalid={Boolean(errors.name)} />
+              {errors.name && <span className="field-error">{errors.name}</span>}
+            </div>
 
-        <label htmlFor="name">Produktnamn:</label>
-        <input
-          id="name"
-          type="text"
-          placeholder="Ange produktnamn"
-        />
+            <div className="form-field">
+              <label htmlFor="price">Pris</label>
+              <input id="price" name="price" type="number" min="0" onKeyDown={preventInvalidNumber} placeholder="Ange pris" aria-invalid={Boolean(errors.price)} />
+              {errors.price && <span className="field-error">{errors.price}</span>}
+            </div>
 
-        <label htmlFor="price">Pris:</label>
-        <input
-          id="price"
-          type="number"
-          min="0"
-          onKeyDown={(e) => {
-            if (e.key === "-" || e.key === "e") {
-              e.preventDefault();
-            }
-          }}
-          placeholder="Ange pris"
-        />
+            <div className="form-field">
+              <label htmlFor="stock">Lager</label>
+              <input id="stock" name="stock" type="number" min="0" onKeyDown={preventInvalidNumber} placeholder="Ange lager" aria-invalid={Boolean(errors.stock)} />
+              {errors.stock && <span className="field-error">{errors.stock}</span>}
+            </div>
+          </div>
 
-        <label htmlFor="stock">Lager:</label>
-        <input
-          id="stock"
-          type="number"
-          min="0"
-          onKeyDown={(e) => {
-            if (e.key === "-" || e.key === "e") {
-              e.preventDefault();
-            }
-          }}
-          placeholder="Ange lager"
-        />
+          <fieldset className={`category-checkboxes ${errors.categories ? "has-error" : ""}`}>
+            <legend>Kategorier</legend>
+            <div className="category-options">
+              <label><input name="categories" type="checkbox" value="1" /> För honom</label>
+              <label><input name="categories" type="checkbox" value="2" /> För henne</label>
+              <label><input name="categories" type="checkbox" value="4" /> T-shirts</label>
+              <label><input name="categories" type="checkbox" value="5" /> Hoodies</label>
+              <label><input name="categories" type="checkbox" value="6" /> Strumpor</label>
+              <label><input name="categories" type="checkbox" value="7" /> Kepsar &amp; Mössor</label>
+            </div>
+            {errors.categories && <span className="field-error">{errors.categories}</span>}
+          </fieldset>
 
-        <fieldset className="category-checkboxes">
-        <legend>Kategorier:</legend>
+          <div className="form-field">
+            <label htmlFor="image">Bild</label>
+            <input id="image" name="image" type="file" accept="image/*" aria-invalid={Boolean(errors.image)} />
+            {errors.image && <span className="field-error">{errors.image}</span>}
+          </div>
+        </div>
 
-        <label>
-            <input type="checkbox" value="his" />
-            För honom
-        </label>
-
-        <label>
-            <input type="checkbox" value="hers" />
-            För henne
-        </label>
-
-        <label>
-            <input type="checkbox" value="t-shirt" />
-            T-shirts
-        </label>
-
-        <label>
-            <input type="checkbox" value="hoodies" />
-            Hoodies
-        </label>
-
-        <label>
-            <input type="checkbox" value="socks" />
-            Strumpor
-        </label>
-
-        <label>
-            <input type="checkbox" value="caps-&-beanies" />
-            Kepsar & Mössor
-        </label>
-        </fieldset>
-
-        <label htmlFor="image">Bild:</label>
-        <input
-          id="image"
-          type="file"
-          accept="image/*"
-        />
-
-        <button type="submit">
-          Lägg till produkt
-        </button>
-
+        <footer className="product-form-actions">
+          <button type="button" className="cancel-button" onClick={onClose}>Avbryt</button>
+          <button type="submit" className="submit-button">Lägg till produkt</button>
+        </footer>
       </form>
     </div>
   );

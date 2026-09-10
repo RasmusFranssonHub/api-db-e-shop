@@ -2,7 +2,7 @@ import './Dashboard.scss';
 import StatCard from '../../components/StatCard/StatCard';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import heroImage from '../../assets/hero/hero.png';
-import {products} from '../../data/products';
+import fallbackProductImage from '../../assets/products/classic-tee.png';
 
 /* Import icons for StatCard */
 import statProductIcon from '../../assets/icons/noun-product.svg';
@@ -15,11 +15,23 @@ import heroPreviewStoreIcon from '../../assets/icons/eye-pink.svg';
 
 /* Form import */
 import ProductsForm from '../../components/ProductsForm/ProductsForm';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Dashboard() {
   const [showForm, setShowForm] = useState(false);
+  const [recentProducts, setRecentProducts] = useState([]);
+  const navigate = useNavigate();
   const username = localStorage.getItem("username");
+  useEffect(() => {
+    fetch('http://localhost:3000/products')
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('Kunde inte hämta produkter')))
+      .then((rows) => setRecentProducts(rows
+        .sort((first, second) => new Date(second.created_date) - new Date(first.created_date))
+        .slice(0, 5)
+        .map((row) => ({ ...row, image: row.image ? `http://localhost:3000${row.image}` : fallbackProductImage }))))
+      .catch((error) => console.error(error));
+  }, []);
   return (
     <div className="dashboard">
 
@@ -59,18 +71,21 @@ function Dashboard() {
           number={45}
           label="Produkter totalt"
           icon={statProductIcon}
+          onClick={() => navigate('/products?filter=all')}
         />
 
         <StatCard
           number={14}
           label="Kategorier"
           icon={statCategoryIcon}
+          onClick={() => navigate('/categories')}
         />
 
         <StatCard
           number={9}
           label="Produkter med lågt saldo"
           icon={statLowStockIcon}
+          onClick={() => navigate('/products?sort=stock_asc')}
         />
       </section>
 
@@ -81,13 +96,14 @@ function Dashboard() {
       <h2>Senast tillagda produkter</h2>
 
       <div className="product-list">
-        {products.map((product) => (
+        {recentProducts.map((product) => (
           <ProductCard
             key={product.id}
             image={product.image}
-            title={product.name}
+            title={product.title}
             price={`${product.price} SEK`}
             stock={`${product.stock}st i lager`}
+            onEdit={() => navigate('/products')}
           />
         ))}
       </div>

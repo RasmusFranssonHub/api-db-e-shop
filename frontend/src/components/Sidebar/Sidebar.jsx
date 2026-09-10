@@ -3,7 +3,7 @@ import dashboardIcon from "../../assets/icons/noun-dashboard.svg";
 import productIcon from "../../assets/icons/noun-product.svg";
 import eyeIcon from "../../assets/icons/noun-eye.svg";
 import tagIcon from "../../assets/icons/noun-tag.svg";
-import { Link } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
 function Sidebar() {
   const username = localStorage.getItem("username");
@@ -15,25 +15,25 @@ function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <Link to="/dashboard" className="nav-item">
+        <NavLink to="/dashboard" className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
           <img src={dashboardIcon} alt="Dashboard" />
           <span>Dashboard</span>
-        </Link>
+        </NavLink>
 
-        <Link to="/products" className="nav-item">
+        <NavLink to="/products" className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
           <img src={productIcon} alt="Product" />
           <span>Produkter</span>
-        </Link>
+        </NavLink>
 
-        <Link to="/categories" className="nav-item">
+        <NavLink to="/categories" className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
           <img src={tagIcon} alt="Tag" />
           <span>Kategorier</span>
-        </Link>
+        </NavLink>
 
-        <Link to="/preview" className="nav-item">
+        <NavLink to="/preview" className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}>
           <img src={eyeIcon} alt="Eye" />
           <span>Förhandsgranska</span>
-        </Link>
+        </NavLink>
       </nav>
 
       <div className="sidebar-user">

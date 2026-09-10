@@ -1,6 +1,9 @@
 //import DB connection
 const express = require('express');
 const db = require('../database/database');
+const multer = require('multer');
+const path = require('path');
+const upload = multer({ storage: multer.diskStorage({ destination: path.join(__dirname, '..', 'uploads'), filename: (_req, file, cb) => cb(null, `${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9.-]/g, '-')}`) }) });
 
 const router = express.Router();
 
@@ -71,7 +74,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST - create product
-router.post('/', async (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
   try {
     const {
       title,
@@ -82,6 +85,7 @@ router.post('/', async (req, res) => {
       category_ids
     } = req.body;
 
+    const savedImage = req.file ? `/uploads/${req.file.filename}` : image;
     // Validate required product fields
     if (
       !title ||
@@ -95,9 +99,10 @@ router.post('/', async (req, res) => {
     }
 
     // Validate categories
+    const parsedCategoryIds = typeof category_ids === 'string' ? JSON.parse(category_ids) : category_ids;
     if (
-      !Array.isArray(category_ids) ||
-      category_ids.length === 0
+      !Array.isArray(parsedCategoryIds) ||
+      parsedCategoryIds.length === 0
     ) {
       return res.status(400).json({
         error: 'At least one category is required'
@@ -107,10 +112,10 @@ router.post('/', async (req, res) => {
     // Check that all category IDs exist
     const [categories] = await db.query(
       'SELECT id FROM categories WHERE id IN (?)',
-      [category_ids]
+      [parsedCategoryIds]
     );
 
-    if (categories.length !== category_ids.length) {
+    if (categories.length !== parsedCategoryIds.length) {
       return res.status(400).json({
         error: 'One or more category IDs do not exist'
       });
@@ -121,13 +126,13 @@ router.post('/', async (req, res) => {
       `INSERT INTO products
       (title, description, stock, price, image)
       VALUES (?, ?, ?, ?, ?)`,
-      [title, description, stock, price, image]
+      [title, description, stock, price, savedImage]
     );
 
     const productId = result.insertId;
 
     // Connect product to all selected categories
-    for (const categoryId of category_ids) {
+    for (const categoryId of parsedCategoryIds) {
       await db.query(
         `INSERT INTO product_categories
         (product_id, category_id)
@@ -157,7 +162,7 @@ router.post('/', async (req, res) => {
 
 
 // PATCH - update product
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', upload.single('image'), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -166,7 +171,7 @@ router.patch('/:id', async (req, res) => {
       description,
       stock,
       price,
-      image,
+      image: savedImage,
       category_ids
     } = req.body;
 
@@ -182,10 +187,11 @@ router.patch('/:id', async (req, res) => {
       });
     }
 
+    const parsedCategoryIds = typeof category_ids === 'string' ? JSON.parse(category_ids) : category_ids;
     // Validate category_ids if included
     if (
-      category_ids !== undefined &&
-      (!Array.isArray(category_ids) || category_ids.length === 0)
+      parsedCategoryIds !== undefined &&
+      (!Array.isArray(parsedCategoryIds) || parsedCategoryIds.length === 0)
     ) {
       return res.status(400).json({
         error: 'category_ids must contain at least one category'
@@ -207,13 +213,13 @@ router.patch('/:id', async (req, res) => {
     const product = products[0];
 
     // Check that all category IDs exist
-    if (category_ids !== undefined) {
+    if (parsedCategoryIds !== undefined) {
       const [categories] = await db.query(
         'SELECT id FROM categories WHERE id IN (?)',
-        [category_ids]
+        [parsedCategoryIds]
       );
 
-      if (categories.length !== category_ids.length) {
+      if (categories.length !== parsedCategoryIds.length) {
         return res.status(400).json({
           error: 'One or more category IDs do not exist'
         });
@@ -225,7 +231,7 @@ router.patch('/:id', async (req, res) => {
     const updatedDescription = description ?? product.description;
     const updatedStock = stock ?? product.stock;
     const updatedPrice = price ?? product.price;
-    const updatedImage = image ?? product.image;
+    const updatedImage = req.file ? `/uploads/${req.file.filename}` : image ?? product.image;
 
     // Update product
     await db.query(
@@ -243,7 +249,7 @@ router.patch('/:id', async (req, res) => {
     );
 
     // Update categories if category_ids was included
-    if (category_ids !== undefined) {
+    if (parsedCategoryIds !== undefined) {
 
       // Remove old category connections
       await db.query(
@@ -252,7 +258,7 @@ router.patch('/:id', async (req, res) => {
       );
 
       // Add new category connections
-      for (const categoryId of category_ids) {
+      for (const categoryId of parsedCategoryIds) {
         await db.query(
           `INSERT INTO product_categories
            (product_id, category_id)
