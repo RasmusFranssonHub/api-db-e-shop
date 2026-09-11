@@ -4,14 +4,20 @@ import plusIcon from "../../assets/icons/noun-plus.svg";
 import categoryIcon from "../../assets/icons/noun-tag.svg";
 import CategoryForm from "../../components/CategoryForm/CategoryForm";
 
-const categoryIconModules = import.meta.glob("../../assets/icons/category-icons/*.svg", {
-  eager: true,
-  import: "default",
-  query: "?url",
-});
+const categoryIconModules = import.meta.glob(
+  "../../assets/icons/category-icons/*.svg",
+  {
+    eager: true,
+    import: "default",
+    query: "?url",
+  }
+);
 
 const categoryIconSources = Object.fromEntries(
-  Object.entries(categoryIconModules).map(([path, source]) => [path.split("/").pop(), source])
+  Object.entries(categoryIconModules).map(([path, source]) => [
+    path.split("/").pop(),
+    source,
+  ])
 );
 
 const resolveCategoryIcon = (icon) => {
@@ -25,28 +31,36 @@ export default function Categories() {
   const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [categoryItems, setCategoryItems] = useState([]);
+
   useEffect(() => {
     fetch("http://localhost:3000/categories")
       .then((response) => {
         if (!response.ok) throw new Error("Kunde inte hämta kategorier.");
         return response.json();
       })
-      .then((rows) => setCategoryItems(
-        rows
+      .then((rows) => {
+        const validCategories = rows
           .filter((row) => row && typeof row.name === "string")
-          .map((row) => ({ ...row, productCount: 0 }))
-      ));
+          .map((row) => ({ ...row, productCount: 0 }));
+
+        setCategoryItems(validCategories);
+      });
   }, []);
 
   const categories = useMemo(() => {
     const categoryList = [...categoryItems];
-    const filteredCategories = categoryList.filter((category) =>
-      typeof category.name === "string" && category.name.toLowerCase().includes(search.trim().toLowerCase())
+    const filteredCategories = categoryList.filter(
+      (category) =>
+        typeof category.name === "string" &&
+        category.name.toLowerCase().includes(search.trim().toLowerCase())
     );
 
     return filteredCategories.sort((firstCategory, secondCategory) => {
       if (sort === "products") {
-        return secondCategory.productCount - firstCategory.productCount || firstCategory.name.localeCompare(secondCategory.name);
+        return (
+          secondCategory.productCount - firstCategory.productCount ||
+          firstCategory.name.localeCompare(secondCategory.name)
+        );
       }
 
       return firstCategory.name.localeCompare(secondCategory.name);
@@ -61,7 +75,11 @@ export default function Categories() {
           <p>Hantera dina produktkategorier här</p>
         </div>
 
-        <button className="add-category-button" type="button" onClick={() => setShowForm(true)}>
+        <button
+          className="add-category-button"
+          type="button"
+          onClick={() => setShowForm(true)}
+        >
           <img src={plusIcon} alt="" />
           Lägg till kategori
         </button>
@@ -71,10 +89,20 @@ export default function Categories() {
         <h2>Filter</h2>
         <div className="categories-filter-controls">
           <label htmlFor="category-search">Sök:</label>
-          <input id="category-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Sök kategori..." />
+          <input
+            id="category-search"
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Sök kategori..."
+          />
 
           <label htmlFor="category-sort">Sortera:</label>
-          <select id="category-sort" value={sort} onChange={(event) => setSort(event.target.value)}>
+          <select
+            id="category-sort"
+            value={sort}
+            onChange={(event) => setSort(event.target.value)}
+          >
             <option value="name">Namn: A–Ö</option>
             <option value="products">Flest produkter</option>
           </select>
@@ -91,12 +119,25 @@ export default function Categories() {
           <div className="categories-list">
             {categories.map((category) => (
               <article className="category-card" key={category.name}>
-                <div className="category-card-icon"><img src={resolveCategoryIcon(category.icon)} alt="" /></div>
+                <div className="category-card-icon">
+                  <img src={resolveCategoryIcon(category.icon)} alt="" />
+                </div>
                 <div>
                   <h3>{category.name}</h3>
-                  <p>{category.productCount} {category.productCount === 1 ? "produkt" : "produkter"}</p>
+                  <p>
+                    {category.productCount}{" "}
+                    {category.productCount === 1 ? "produkt" : "produkter"}
+                  </p>
                 </div>
-                <div className="category-card-actions"><button type="button" onClick={() => setEditingCategory(category)} aria-label={`Redigera ${category.name}`}>✎</button></div>
+                <div className="category-card-actions">
+                  <button
+                    type="button"
+                    onClick={() => setEditingCategory(category)}
+                    aria-label={`Redigera ${category.name}`}
+                  >
+                    ✎
+                  </button>
+                </div>
               </article>
             ))}
           </div>
@@ -116,12 +157,59 @@ export default function Categories() {
               body: JSON.stringify(category),
             });
             const saved = await response.json().catch(() => ({}));
-            if (!response.ok) throw new Error(saved.error || "Kategorin kunde inte sparas.");
-            setCategoryItems((items) => [...items, { ...saved, productCount: 0 }]);
+            if (!response.ok) {
+              throw new Error(saved.error || "Kategorin kunde inte sparas.");
+            }
+
+            setCategoryItems((items) => [
+              ...items,
+              { ...saved, productCount: 0 },
+            ]);
           }}
         />
       )}
-      {editingCategory && <CategoryForm category={editingCategory} existingNames={categoryItems.map((category) => category.name)} onClose={() => setEditingCategory(null)} onUpdate={async (updatedCategory) => { const response = await fetch(`http://localhost:3000/categories/${updatedCategory.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updatedCategory) }); const saved = await response.json().catch(() => ({})); if (!response.ok) throw new Error(saved.error || "Kategorin kunde inte uppdateras."); setCategoryItems((items) => items.map((item) => item.id === saved.id ? { ...item, ...saved, productCount: item.productCount } : item)); }} onDelete={async (id) => { const response = await fetch(`http://localhost:3000/categories/${id}`, { method: 'DELETE' }); if (response.ok) setCategoryItems((items) => items.filter((item) => item.id !== id)); }} />}
+      {editingCategory && (
+        <CategoryForm
+          category={editingCategory}
+          existingNames={categoryItems.map((category) => category.name)}
+          onClose={() => setEditingCategory(null)}
+          onUpdate={async (updatedCategory) => {
+            const response = await fetch(
+              `http://localhost:3000/categories/${updatedCategory.id}`,
+              {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(updatedCategory),
+              }
+            );
+            const saved = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+              throw new Error(saved.error || "Kategorin kunde inte uppdateras.");
+            }
+
+            setCategoryItems((items) =>
+              items.map((item) =>
+                item.id === saved.id
+                  ? { ...item, ...saved, productCount: item.productCount }
+                  : item
+              )
+            );
+          }}
+          onDelete={async (id) => {
+            const response = await fetch(
+              `http://localhost:3000/categories/${id}`,
+              { method: "DELETE" }
+            );
+
+            if (response.ok) {
+              setCategoryItems((items) =>
+                items.filter((item) => item.id !== id)
+              );
+            }
+          }}
+        />
+      )}
     </section>
   );
 }
