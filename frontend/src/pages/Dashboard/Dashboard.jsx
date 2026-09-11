@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import heroImage from "../../assets/hero/hero.png";
+import mobileHeroImage from "../../assets/hero/header-mobile.png";
 import heroPreviewStoreIcon from "../../assets/icons/eye-pink.svg";
 import heroAddProductIcon from "../../assets/icons/plus-pink.svg";
 import statLowStockIcon from "../../assets/icons/noun-cart.svg";
@@ -15,6 +16,7 @@ import "./Dashboard.scss";
 function Dashboard() {
   const [showForm, setShowForm] = useState(false);
   const [recentProducts, setRecentProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState({
     products: 0,
     categories: 0,
@@ -55,15 +57,47 @@ function Dashboard() {
           lowStock,
         });
         setRecentProducts(newestProducts);
+        setCategories(categories);
       })
       .catch((error) => console.error(error));
   }, []);
+
+  const createProduct = async (body) => {
+    const response = await fetch("http://localhost:3000/products", {
+      method: "POST",
+      body,
+    });
+    const created = await response.json();
+
+    if (!response.ok) {
+      throw new Error(created.error || "Produkten kunde inte sparas.");
+    }
+
+    const newProduct = {
+      ...created,
+      image: created.image
+        ? `http://localhost:3000${created.image}`
+        : fallbackProductImage,
+    };
+
+    setRecentProducts((items) => [newProduct, ...items].slice(0, 5));
+    setStats((currentStats) => ({
+      ...currentStats,
+      products: currentStats.products + 1,
+      lowStock:
+        currentStats.lowStock + (Number(created.stock) <= 10 ? 1 : 0),
+    }));
+    setShowForm(false);
+  };
 
   return (
     <div className="dashboard">
       <section className="hero">
         <div className="hero-image">
-          <img src={heroImage} alt="Hero" className="hero-img" />
+          <picture>
+            <source media="(max-width: 1200px)" srcSet={mobileHeroImage} />
+            <img src={heroImage} alt="Hero" className="hero-img" />
+          </picture>
         </div>
 
         <div className="hero-content">
@@ -88,14 +122,14 @@ function Dashboard() {
       <section className="stats">
         <StatCard
           number={stats.products}
-          label="Produkter totalt"
+          label="Produkter i butiken"
           icon={statProductIcon}
           onClick={() => navigate("/products?filter=all")}
         />
 
         <StatCard
           number={stats.categories}
-          label="Kategorier"
+          label="Kategorier i butiken"
           icon={statCategoryIcon}
           onClick={() => navigate("/categories")}
         />
@@ -124,7 +158,13 @@ function Dashboard() {
       </div>
       </section>
 
-      {showForm && <ProductsForm onClose={() => setShowForm(false)} />}
+      {showForm && (
+        <ProductsForm
+          categories={categories}
+          onClose={() => setShowForm(false)}
+          onCreated={createProduct}
+        />
+      )}
     </div>
   );
 }

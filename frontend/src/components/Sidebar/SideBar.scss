@@ -81,18 +81,22 @@
 
 .sidebar-user {
   margin-top: auto;
-  border: 0.7px solid var(--text-secondary);
-  border-radius: 10px;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 20px;
-  padding: 25px 15px;
+  column-gap: 14px;
+  row-gap: 14px;
+  padding: 16px;
   margin-bottom: 20px;
+  border: 1px solid rgba(64, 57, 52, 0.18);
+  border-radius: 14px;
+  background: color(var(--color-sidebar));
+  box-shadow: var(--shadow-sm);
 }
 
 .user-avatar {
-  width: 75px;
-  height: 75px;
+  width: 52px;
+  height: 52px;
 
   display: grid;
   place-items: center;
@@ -100,7 +104,7 @@
   border-radius: 50%;
   background: #FDF9F6;
 
-  font-size: 36px;
+  font-size: 22px;
   font-weight: 700;
 }
 
@@ -111,10 +115,85 @@
 }
 
 .user-name {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 }
 .user-role {
   font-size: 14px;
   color: var(--color-text-secondary);
+}
+
+.logout-button {
+  grid-column: 1 / -1;
+  min-height: 38px;
+  border: 1px solid rgba(205, 121, 121, 0.72);
+  border-radius: 8px;
+  background: transparent;
+  color: #a64f4f;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.logout-button:hover {
+  border-color: var(--color-primary-btn);
+  background: var(--color-primary-btn);
+  color: #fff;
+}
+
+.mobile-menu-button,
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .sidebar {
+    right: 0;
+    left: auto;
+    width: min(315px, 86vw);
+    padding-top: 12px;
+    box-shadow: -16px 0 34px rgba(0, 0, 0, 0.18);
+    transform: translateX(110%) !important;
+    transition: transform 220ms ease;
+  }
+
+  .sidebar.is-open {
+    transform: translateX(0) !important;
+  }
+
+  .mobile-menu-button {
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    left: auto;
+    z-index: 1100;
+    display: grid !important;
+    width: 48px;
+    height: 48px;
+    place-content: center;
+    gap: 5px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+  }
+
+  .mobile-menu-button span {
+    width: 25px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--color-text);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    display: block !important;
+    border: 0;
+    background: rgba(0, 0, 0, 0.35);
+  }
 }

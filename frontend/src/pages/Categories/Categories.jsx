@@ -25,6 +25,9 @@ const resolveCategoryIcon = (icon) => {
   return categoryIconSources[iconFileName] || categoryIcon;
 };
 
+const getCategoryIds = (product) =>
+  product.category_ids ? product.category_ids.split(",").map(Number) : [];
+
 export default function Categories() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("name");
@@ -33,18 +36,33 @@ export default function Categories() {
   const [categoryItems, setCategoryItems] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/categories")
-      .then((response) => {
-        if (!response.ok) throw new Error("Kunde inte hämta kategorier.");
-        return response.json();
+    Promise.all([
+      fetch("http://localhost:3000/categories"),
+      fetch("http://localhost:3000/products"),
+    ])
+      .then(async ([categoriesResponse, productsResponse]) => {
+        if (!categoriesResponse.ok || !productsResponse.ok) {
+          throw new Error("Kunde inte hämta kategorier.");
+        }
+
+        return Promise.all([
+          categoriesResponse.json(),
+          productsResponse.json(),
+        ]);
       })
-      .then((rows) => {
-        const validCategories = rows
+      .then(([categoryRows, productRows]) => {
+        const validCategories = categoryRows
           .filter((row) => row && typeof row.name === "string")
-          .map((row) => ({ ...row, productCount: 0 }));
+          .map((row) => ({
+            ...row,
+            productCount: productRows.filter((product) =>
+              getCategoryIds(product).includes(row.id)
+            ).length,
+          }));
 
         setCategoryItems(validCategories);
-      });
+      })
+      .catch((error) => console.error(error));
   }, []);
 
   const categories = useMemo(() => {

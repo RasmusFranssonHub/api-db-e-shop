@@ -80,3 +80,21 @@ body {
   overflow: auto;
   margin-left: var(--sidebar-width);
 }
+
+@media (max-width: 1200px) {
+  .app {
+    overflow: visible;
+  }
+
+  .main-content {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    margin-left: 0 !important;
+    padding-top: 68px;
+  }
+
+  .main-content:has(.dashboard) {
+    padding-top: 0;
+  }
+}

@@ -13,3 +13,10 @@
   padding: 0;
   margin-left: var(--sidebar-width);
 }
+
+@media (max-width: 1200px) {
+  .main-content {
+    margin-left: 0;
+    padding-top: 68px;
+  }
+}
